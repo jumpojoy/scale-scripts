@@ -1,0 +1,21 @@
+{% set flavor_name = flavor_name or "bm_flavor" %}
+---
+  NovaServers.boot_and_delete_server:
+    -
+      args:
+        flavor:
+            name: "{{flavor_name}}"
+        image:
+            name: "^virtual_trusty_ext4$"
+        force_delete: false
+        nics:
+          [{net-id: "NETWORK_UUID"}]
+        
+      runner:
+        type: "constant"
+        times: 2
+        concurrency: 1
+      context:
+        users:
+          tenants: 1
+          users_per_tenant: 1
