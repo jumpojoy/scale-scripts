@@ -1,14 +1,15 @@
 HARDWARE_NODES_FILE=${HARDWARE_NODES_FILE:-'/root/hardware-nodes.ini'}
 DEFAULT_CPU_ARCH='x86_64'
 DEFAULT_RAM='32768'
-DEFAULT_CPU='4'
+DEFAULT_CPU='12'
 DEFAULT_DIK='128'
-IRONIC_DEPLOY_KERNEL_ID=$(nova image-list|grep ironic-deploy-linux| get_field 2)
-IRONIC_DEPLOY_RAMDISK_ID=$(nova image-list|grep ironic-deploy-initramfs| get_field 2)
-IRONIC_DEPLOY_SQUASHFS=$(nova image-list|grep ironic-deploy-squashfs| get_field 2)
 DEFAULT_IPMI_USERNAME='engineer'
 
 source ./inc/helpers.sh
+
+IRONIC_DEPLOY_KERNEL_ID=$(nova image-list|grep ironic-deploy-linux| get_field 2)
+IRONIC_DEPLOY_RAMDISK_ID=$(nova image-list|grep ironic-deploy-initramfs| get_field 2)
+IRONIC_DEPLOY_SQUASHFS=$(nova image-list|grep ironic-deploy-squashfs| get_field 2)
 
 function enroll_nodes {
   ironic_nodes=$(iniget_sections "$HARDWARE_NODES_FILE")
