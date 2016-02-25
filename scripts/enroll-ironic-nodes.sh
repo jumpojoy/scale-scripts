@@ -4,12 +4,13 @@ DEFAULT_RAM='32768'
 DEFAULT_CPU='12'
 DEFAULT_DIK='128'
 DEFAULT_IPMI_USERNAME='engineer'
+IRONIC_DEPLOY_DRIVER='fuel_ipmitool'
 
 source ./inc/helpers.sh
 
-IRONIC_DEPLOY_KERNEL_ID=$(nova image-list|grep ironic-deploy-linux| get_field 2)
-IRONIC_DEPLOY_RAMDISK_ID=$(nova image-list|grep ironic-deploy-initramfs| get_field 2)
-IRONIC_DEPLOY_SQUASHFS=$(nova image-list|grep ironic-deploy-squashfs| get_field 2)
+IRONIC_DEPLOY_KERNEL_ID=$(nova image-list|grep ironic-deploy-linux| get_field 1)
+IRONIC_DEPLOY_RAMDISK_ID=$(nova image-list|grep ironic-deploy-initramfs| get_field 1)
+IRONIC_DEPLOY_SQUASHFS=$(nova image-list|grep ironic-deploy-squashfs| get_field 1)
 
 function enroll_nodes {
   ironic_nodes=$(iniget_sections "$HARDWARE_NODES_FILE")
@@ -26,6 +27,7 @@ function enroll_nodes {
     # Common parameters for VM and HW nodes
     mac_address=$(iniget $HARDWARE_NODES_FILE $node_name mac_address)
     cpus=$(iniget $HARDWARE_NODES_FILE $node_name cpus)
+    cpu_arch=$(iniget $HARDWARE_NODES_FILE $node_name cpu_arch)
     memory_mb=$(iniget $HARDWARE_NODES_FILE $node_name memory_mb)
     local_gb=$(iniget $HARDWARE_NODES_FILE $node_name local_gb)
 
@@ -34,9 +36,10 @@ function enroll_nodes {
     ipmi_password=$(iniget $HARDWARE_NODES_FILE $node_name ipmi_password)
 
     # Override empty values with defaults
-    cpus=${cpus:-${IRONIC_VM_SPECS_CPU}}
-    memory_mb=${memory_mb:-${IRONIC_VM_SPECS_RAM}}
-    local_gb=${local_gb:-${IRONIC_VM_SPECS_DISK}}
+    cpus=${cpus:-${DEFAULT_CPU}}
+    cpu_arch=${cpu_arch:-${DEFAULT_CPU_ARCH}}
+    memory_mb=${memory_mb:-${DEFAULT_RAM}}
+    local_gb=${local_gb:-${DEFAULT_DIK}}
     ipmi_username=${ipmi_username:-${DEFAULT_IPMI_USERNAME}}
     
     local node_options="\
