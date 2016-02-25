@@ -6,6 +6,7 @@ DEFAULT_DIK='128'
 IRONIC_DEPLOY_KERNEL_ID=$(nova image-list|grep ironic-deploy-linux| get_field 2)
 IRONIC_DEPLOY_RAMDISK_ID=$(nova image-list|grep ironic-deploy-initramfs| get_field 2)
 IRONIC_DEPLOY_SQUASHFS=$(nova image-list|grep ironic-deploy-squashfs| get_field 2)
+DEFAULT_IPMI_USERNAME='engineer'
 
 source ./inc/helpers.sh
 
@@ -35,6 +36,7 @@ function enroll_nodes {
     cpus=${cpus:-${IRONIC_VM_SPECS_CPU}}
     memory_mb=${memory_mb:-${IRONIC_VM_SPECS_RAM}}
     local_gb=${local_gb:-${IRONIC_VM_SPECS_DISK}}
+    ipmi_username=${ipmi_username:-${DEFAULT_IPMI_USERNAME}}
     
     local node_options="\
       -i ipmi_address=${ipmi_address} \
