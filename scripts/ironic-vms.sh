@@ -29,13 +29,15 @@ DEFAULT_CPU_ARCH='x86_64'
 DEFAULT_RAM='1024'
 DEFAULT_CPU='1'
 DEFAULT_DIK='8'
-IRONIC_DEPLOY_DRIVER='fuel_libvirt'
+IRONIC_DEPLOY_DRIVER=${IRONIC_DEPLOY_DRIVER:-'fuel_libvirt'}
 
 source ./inc/helpers.sh
 
-IRONIC_DEPLOY_KERNEL_ID=$(nova image-list|grep ironic-deploy-linux| get_field 1)
-IRONIC_DEPLOY_RAMDISK_ID=$(nova image-list|grep ironic-deploy-initramfs| get_field 1)
-IRONIC_DEPLOY_SQUASHFS=$(nova image-list|grep ironic-deploy-squashfs| get_field 1)
+IRONIC_DEPLOY_KERNEL_ID=${IRONIC_DEPLOY_KERNEL_ID:-$(nova image-list|grep ironic-deploy-linux| get_field 1)}
+IRONIC_DEPLOY_RAMDISK_ID=${IRONIC_DEPLOY_RAMDISK_ID:-$(nova image-list|grep ironic-deploy-initramfs| get_field 1)}
+IRONIC_DEPLOY_SQUASHFS=${IRONIC_DEPLOY_SQUASHFS:-$(nova image-list|grep ironic-deploy-squashfs| get_field 1)}
+
+DEPLOY_KEY_FILE='/etc/ironic/deploy_key'
 
 function enrol_vms_to_ironic {
   ironic_nodes=$(iniget_sections "$INI_FILE")
@@ -46,6 +48,17 @@ function enrol_vms_to_ironic {
     local local_gb
     local cpu_arch
     local libvirt_uri
+
+    case $IRONIC_DEPLOY_DRIVER in
+        "fuel_libvirt")
+        ;;
+        "ansible_libvirt")
+        local node_options
+        node_options=" \
+          -i deploy_key_file=$DEPLOY_KEY_FILE
+        "
+        ;;
+    esac
 
     mac_address=$(iniget $INI_FILE $node_name mac_address)
     cpus=$(iniget $INI_FILE $node_name cpus)
